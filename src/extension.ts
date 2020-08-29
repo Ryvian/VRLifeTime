@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as child_process from "child_process";
-import * as path from "path";
 
 const EXTENSION_NAME = "VRLifeTime";
 const TIMEOUT_TIME = 20;
@@ -22,7 +21,6 @@ interface DetectorOutput {
 // this method is called when vs code is activated
 export function activate(context: vscode.ExtensionContext) {
 	let lifetimeObj = {};
-	let rawLifetimeObj = {};
 	const collection = vscode.languages.createDiagnosticCollection('result');
 	let lastCallMillisec = Date.now();
 	console.log(`${EXTENSION_NAME} is activated`);
@@ -166,7 +164,7 @@ export function activate(context: vscode.ExtensionContext) {
 			`"${__dirname}/../backend/lifetime_query/query.sh" "${inputString.replace(/"/g, '\\"')}"`, 
 			{shell: true});
 		let returnMsg = process.stdout.toString() + process.stderr.toString();
-		let returnObj = undefined;
+		let returnObj = {};
 		try {
 			returnObj = JSON.parse(returnMsg);
 		} catch(e){
@@ -177,9 +175,8 @@ export function activate(context: vscode.ExtensionContext) {
 				compileProject();
 				updateLifetimeObj(true);
 			}
-			return;
+
 		}
-		rawLifetimeObj = JSON.parse(JSON.stringify(returnObj));
 		// returnObj["src/main.rs"] = returnObj["src/main.rs"] + ", 45:46: 48:6" //!
 		
 		
@@ -478,6 +475,11 @@ export function activate(context: vscode.ExtensionContext) {
 		compileProject();
 		updateDiagnostics(collection);
 	}, null, context.subscriptions);
+
+	if (activeEditor) {
+		updateDiagnostics(collection);
+
+	}	
 
 }
 
