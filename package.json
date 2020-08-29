@@ -1,0 +1,49 @@
+{
+	"name": "vrlifetime",
+	"displayName": "VRLifetime",
+	"description": "a plugin to highlight lifetime of lock objects and alert possible double-lock hazards",
+	"version": "0.0.1",
+	"publisher": "vrlifetime",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.32.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:rust"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.vrlifetime",
+				"title": "VRLifetime"
+			}
+		],
+		"colors": [
+			{
+				"id": "vrlifetime.lifetimeLineBackground",
+				"description": "Background decoration color for codes within the selected variable",
+				"defaults": {
+					"dark": "#ce0f0f38",
+					"light": "#ff967e59",
+					"highContrast": "#ce0f0f8c"
+				}
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "tslint -p ./",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@types/node": "^8.9.1",
+		"tslint": "^5.16.0",
+		"typescript": "^3.5.1",
+		"@types/vscode": "^1.32.0"
+	}
+}

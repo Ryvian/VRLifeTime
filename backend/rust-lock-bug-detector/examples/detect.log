@@ -1,0 +1,98 @@
+"/home/zhang/.rustup/toolchains/nightly-2020-05-10-x86_64-unknown-linux-gnu/bin/cargo" "check"
+fn with locks: 18, lockguards num: 18, local fn num: 21
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[5]," })
+{	FirstLock: (SpinRwLockReadGuard, "i32")
+		src/main.rs:109:16: 109:31
+	SecondLock: (SpinRwLockWriteGuard, "i32")
+		src/main.rs:127:10: 127:26
+	Callchains: {[src/main.rs:110:20: 110:46]}
+}
+{	FirstLock: (SpinRwLockWriteGuard, "i32")
+		src/main.rs:116:16: 116:32
+	SecondLock: (SpinRwLockWriteGuard, "i32")
+		src/main.rs:127:10: 127:26
+	Callchains: {[src/main.rs:117:20: 117:46]}
+}
+{	FirstLock: (SpinRwLockWriteGuard, "i32")
+		src/main.rs:116:16: 116:32
+	SecondLock: (SpinRwLockReadGuard, "i32")
+		src/main.rs:123:10: 123:25
+	Callchains: {[src/main.rs:118:20: 118:45]}
+}
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[2]," })
+{	FirstLock: (ParkingLotMutexGuard, "parking_lot::raw_mutex::RawMutex, i32")
+		src/main.rs:61:16: 61:31
+	SecondLock: (ParkingLotMutexGuard, "parking_lot::raw_mutex::RawMutex, i32")
+		src/main.rs:68:10: 68:25
+	Callchains: {[src/main.rs:63:20: 63:46]}
+}
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[4]," })
+{	FirstLock: (SpinMutexGuard, "i32")
+		src/main.rs:94:16: 94:31
+	SecondLock: (SpinMutexGuard, "i32")
+		src/main.rs:105:10: 105:25
+	Callchains: {[src/main.rs:96:20: 96:39], [src/main.rs:95:20: 95:32, src/main.rs:101:9: 101:28, src/main.rs:96:20: 96:39]}
+}
+{	FirstLock: (SpinMutexGuard, "i32")
+		src/main.rs:94:16: 94:31
+	SecondLock: (SpinMutexGuard, "i32")
+		src/main.rs:94:16: 94:31
+	Callchains: {[src/main.rs:95:20: 95:32, src/main.rs:101:9: 101:28]}
+}
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[0]," })
+{	FirstLock: (StdMutexGuard, "i32")
+		src/main.rs:27:13: 27:19
+	SecondLock: (StdMutexGuard, "i32")
+		src/main.rs:35:10: 35:34
+	Callchains: {[src/main.rs:30:20: 30:38]}
+}
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[1]," })
+{	FirstLock: (StdRwLockReadGuard, "i32")
+		src/main.rs:39:16: 39:40
+	SecondLock: (StdRwLockWriteGuard, "i32")
+		src/main.rs:57:10: 57:35
+	Callchains: {[src/main.rs:40:20: 40:45]}
+}
+{	FirstLock: (StdRwLockWriteGuard, "i32")
+		src/main.rs:46:16: 46:41
+	SecondLock: (StdRwLockReadGuard, "i32")
+		src/main.rs:53:10: 53:34
+	Callchains: {[src/main.rs:48:20: 48:44]}
+}
+{	FirstLock: (StdRwLockReadGuard, "i32")
+		src/main.rs:39:16: 39:40
+	SecondLock: (StdRwLockReadGuard, "i32")
+		src/main.rs:53:10: 53:34
+	Callchains: {[src/main.rs:41:20: 41:44]}
+}
+{	FirstLock: (StdRwLockWriteGuard, "i32")
+		src/main.rs:46:16: 46:41
+	SecondLock: (StdRwLockWriteGuard, "i32")
+		src/main.rs:57:10: 57:35
+	Callchains: {[src/main.rs:47:20: 47:45]}
+}
+LockGuardSrc: ParamSrc(ParamSrcContext { struct_type: "Foo", fields: "field[3]," })
+{	FirstLock: (ParkingLotRwLockWriteGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:79:16: 79:32
+	SecondLock: (ParkingLotRwLockWriteGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:90:10: 90:26
+	Callchains: {[src/main.rs:80:20: 80:53]}
+}
+{	FirstLock: (ParkingLotRwLockReadGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:72:16: 72:31
+	SecondLock: (ParkingLotRwLockReadGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:86:10: 86:25
+	Callchains: {[src/main.rs:74:20: 74:52]}
+}
+{	FirstLock: (ParkingLotRwLockReadGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:72:16: 72:31
+	SecondLock: (ParkingLotRwLockWriteGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:90:10: 90:26
+	Callchains: {[src/main.rs:73:20: 73:53]}
+}
+{	FirstLock: (ParkingLotRwLockWriteGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:79:16: 79:32
+	SecondLock: (ParkingLotRwLockReadGuard, "parking_lot::raw_rwlock::RawRwLock, i32")
+		src/main.rs:86:10: 86:25
+	Callchains: {[src/main.rs:81:20: 81:52]}
+}
