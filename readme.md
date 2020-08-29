@@ -1,3 +1,7 @@
+# VRLifeTime
+An VS Code plugin to visualize lifetime in Rust programs to help avoid concurrency and memory bugs.
+--------
+
 ## debug install
 
 1. install node.js
