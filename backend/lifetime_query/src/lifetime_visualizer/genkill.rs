@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 
 const RUN_LIMIT: u32 = 10000;
+/// Data structure for WorkList Algorithm
+/// https://en.wikipedia.org/wiki/Reaching_definition#worklist_algorithm
 pub struct GenKill {
     gen: HashMap<Location, HashSet<CrateLocalId>>,
     kill: HashMap<Location, HashSet<CrateLocalId>>,
@@ -17,6 +19,9 @@ pub struct GenKill {
 }
 
 impl GenKill {
+    /// Create the WorkList data structure.
+    /// `fn_id` must match `body`.
+    /// `crate_locals` record the all the local info in the crate where the fn_id reside.
     pub fn new(
         fn_id: LocalDefId,
         body: &Body,
@@ -68,7 +73,30 @@ impl GenKill {
         //         after.get_mut(loc).unwrap().extend(ids.iter());
         //     }
         // }
-        worklist.push(Location::START);
+        // worklist.push(Location::START);
+        for (bb, bb_data) in body.basic_blocks().iter_enumerated() {
+            let statements_len = bb_data.statements.len();
+            for ii in 0..statements_len {
+                worklist.push(Location {
+                    block: bb,
+                    statement_index: ii,
+                });
+            }
+            if let Some(ref term) = bb_data.terminator {
+                // neglect resume and unreachable
+                match term.kind {
+                    TerminatorKind::Resume | TerminatorKind::Unreachable => {
+                        continue;
+                    }
+                    _ => {}
+                }
+                let loc = Location {
+                    block: bb,
+                    statement_index: statements_len,
+                };
+                worklist.push(loc);
+            }
+        }
         // println!("init_before: {:#?}", before);
         Self {
             gen,
@@ -79,6 +107,8 @@ impl GenKill {
         }
     }
 
+    /// Get the live locations for each local in the given body.
+    /// `body` must match the `body` in `new()`
     pub fn analyze(&mut self, body: &Body) -> HashMap<CrateLocalId, HashSet<Location>> {
         let mut count: u32 = 0;
         while !self.worklist.is_empty() && count <= RUN_LIMIT {
@@ -160,6 +190,7 @@ impl GenKill {
         crate_local_live_locs
     }
 
+    /// Get all the live Local IDs for a given location.
     pub fn get_live_infos(&self, loc: &Location) -> Option<&HashSet<CrateLocalId>> {
         if let Some(context) = self.before.get(loc) {
             if !context.is_empty() {

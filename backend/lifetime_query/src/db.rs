@@ -5,7 +5,7 @@ use std::io::prelude::*;
 use std::fmt;
 use std::cmp::Ordering;
 
-
+/// Input from the frontend.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Input {
     pub root: String,
@@ -69,7 +69,7 @@ mod test {
         println!("{:?}", serde_json::to_string(&crate_lifetime_ranges).unwrap());
     }
 }
-
+/// Lifetime Ranges of a variable (fn_id, local) to be serialized to a local file.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct LifetimeRanges {
     fn_id_local: String,
@@ -85,6 +85,7 @@ impl LifetimeRanges {
         }
     }
 }
+/// Lifetime ranges of all the variables in a crate.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct CrateLifetimeRanges {
     crate_name: String,

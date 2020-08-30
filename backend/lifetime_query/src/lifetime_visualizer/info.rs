@@ -12,6 +12,7 @@ use rustc_span::Span;
 use std::collections::HashSet;
 
 use std::hash::Hash;
+/// A local in a crate is uniquely identified by fn_id and local.
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub struct CrateLocalId {
     pub fn_id: LocalDefId,
@@ -29,7 +30,8 @@ impl CrateLocalId {
         Self { fn_id, local }
     }
 }
-
+/// The info of a local encompasses span(source code range) and locations
+/// where StorageLive, StorageDead, drop, move are called.
 #[derive(Debug, Clone)]
 pub struct CrateLocalInfo {
     pub span: Span,

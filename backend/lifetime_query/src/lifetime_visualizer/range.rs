@@ -20,6 +20,8 @@ use std::collections::{HashMap, HashSet, LinkedList};
 
 // }
 
+/// Represents the range of a variable in the source code: 
+/// filename, begin (line num, column num), end (line num, column num)
 pub struct Range {
     filename: String,
     begin: (u64, u64),
@@ -39,7 +41,7 @@ impl Range {
 
     // }
 }
-
+/// A position in a file: (line num, column num)
 #[derive(Eq, Clone, Copy, Hash, Debug)]
 struct PosInFile(u64, u64);
 
@@ -64,6 +66,7 @@ impl Ord for PosInFile {
         }
     }
 }
+/// A range in a file: (begin pos, end pos).
 #[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub struct RangeInFile(PosInFile, PosInFile);
 
@@ -93,6 +96,7 @@ impl fmt::Display for RangeInFile {
         write!(f, "{}:{}: {}:{}", (self.0).0, (self.0).1, (self.1).0, (self.1).1)
     }
 }
+/// The lifetime of a variable may span multiple ranges in a file.
 #[derive(Default, Debug)]
 struct RangesInFile {
     ranges: HashSet<RangeInFile>,
@@ -128,7 +132,7 @@ impl RangesInFile {
         result
     }
 }
-
+/// The lifetime of a variable may span across files.
 #[derive(Default, Debug)]
 pub struct RangesAcrossFiles {
     ranges: HashMap<String, HashSet<RangeInFile>>,

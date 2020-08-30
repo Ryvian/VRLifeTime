@@ -26,6 +26,8 @@ use genkill::GenKill;
 mod range;
 use range::{get_fn_range, RangeInFile, RangesAcrossFiles};
 use std::collections::{HashMap, HashSet};
+/// Lifetime visualizer for variables in a crate.
+/// Besides the local info, callgraph in the crate is also included.
 pub struct LifetimeVisualizer {
     crate_locals: HashMap<CrateLocalId, CrateLocalInfo>,
     crate_callgraph: Callgraph,
@@ -45,6 +47,7 @@ impl LifetimeVisualizer {
         }
     }
 
+    /// Collect the lifetime of variables in the current crate and serialize the info to json files.
     pub fn analyze(&mut self, tcx: TyCtxt) {
         let ids = tcx.mir_keys(LOCAL_CRATE);
         let fn_ids: Vec<LocalDefId> = ids
@@ -56,7 +59,7 @@ impl LifetimeVisualizer {
                     .is_fn_or_closure()
             })
             .collect();
-        println!("fn_ids: {:#?}", fn_ids);
+        // println!("fn_ids: {:#?}", fn_ids);
         // for fn_id in &fn_ids {
         //     // println!("{}", get_fn_path(&tcx, fn_id.to_def_id()));
         //     // println!("{}", tcx.item_name(fn_id.to_def_id()).to_string());
@@ -139,6 +142,7 @@ impl LifetimeVisualizer {
         let body = tcx.optimized_mir(fn_id);
         let mut genkill = GenKill::new(fn_id, body, &self.crate_locals);
         let local_live_locs = genkill.analyze(body);
+        // println!("{:#?}", local_live_locs);
         let transitive = self.crate_callgraph.gen_transitive();
         let mut local_live_fns: HashMap<CrateLocalId, HashSet<LocalDefId>> = HashMap::new();
         if let Some(callsites) = self.crate_callgraph.get(&fn_id) {

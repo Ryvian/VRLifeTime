@@ -12,6 +12,8 @@ use std::collections::{HashMap, HashSet};
 
 use crate::lifetime_visualizer::info::{CrateLocalId, CrateLocalInfo};
 
+/// Collect the lifetime info for the given function body.
+/// fn_id and body must match.
 pub fn collect_lifetime_info(fn_id: LocalDefId, body: &Body) -> HashMap<CrateLocalId, CrateLocalInfo> {
     let mut crate_locals: HashMap<CrateLocalId, CrateLocalInfo> = HashMap::new();
     for (local, local_decl) in body.local_decls.iter_enumerated() {
@@ -30,6 +32,7 @@ pub fn collect_lifetime_info(fn_id: LocalDefId, body: &Body) -> HashMap<CrateLoc
     collect_gen_kill_bbs(crate_locals, body, &def_use_analysis)
 }
 
+/// Update the local info to return a new one.
 fn collect_gen_kill_bbs(
     crate_locals: HashMap<CrateLocalId, CrateLocalInfo>,
     _body: &Body,

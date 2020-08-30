@@ -5,6 +5,11 @@ use rustc_hir::def_id::LocalDefId;
 use rustc_middle::mir::{BasicBlock, Body, Operand, TerminatorKind};
 use rustc_middle::ty::TyKind;
 use std::collections::{HashMap, HashSet};
+/// Callgraph for the current crate: Map<caller_fn_id, Map<call_location, callee_fn_id>>
+/// Since call_location can only be the terminator of a Basicblock, BasicBlock alone is enough
+/// uniquely identifies a call_location.
+/// `direct` means it only stores the direct calling of a function
+/// because we cannot (precisely) track the trait and function ptr for now.
 pub struct Callgraph {
     pub direct: HashMap<LocalDefId, HashMap<BasicBlock, LocalDefId>>,
 }
@@ -16,6 +21,8 @@ impl Callgraph {
         }
     }
 
+    /// Add a callsite to callgraph.
+    /// `bb` is the BasicBlock where `callee` is called in `caller`.
     fn insert_direct(&mut self, caller: LocalDefId, bb: BasicBlock, callee: LocalDefId) {
         if let Some(callees) = self.direct.get_mut(&caller) {
             callees.insert(bb, callee);
@@ -26,6 +33,9 @@ impl Callgraph {
         }
     }
 
+    /// For the given caller's body, add all the callsites in it to the callgraph.
+    /// `caller` must match `body`.
+    /// `crate_fn_ids` is all the fn_ids in the crate where `caller` resides.
     pub fn generate(&mut self, caller: LocalDefId, body: &Body, crate_fn_ids: &[LocalDefId]) {
         for (bb, bb_data) in body.basic_blocks().iter_enumerated() {
             let terminator = bb_data.terminator();
@@ -50,6 +60,7 @@ impl Callgraph {
         }
     }
 
+    /// Get all the callsites inside a given caller.
     pub fn get(&self, fn_id: &LocalDefId) -> Option<&HashMap<BasicBlock, LocalDefId>> {
         if let Some(callsites) = self.direct.get(fn_id) {
             if !callsites.is_empty() {
@@ -61,6 +72,8 @@ impl Callgraph {
         None
     }
 
+    /// Get all the transitive callees inside a given caller,
+    /// including direct callees, callees of direct callees, etc.
     pub fn gen_transitive(&self) -> HashMap<LocalDefId, HashSet<LocalDefId>> {
         let mut transitive: HashMap<LocalDefId, HashSet<LocalDefId>> = HashMap::new();
         for (caller, callsites) in &self.direct {
@@ -87,6 +100,7 @@ impl Callgraph {
         transitive
     }
 
+    /// Print callgraph for debug only.
     pub fn _print(&self) {
         for (caller, callees) in &self.direct {
             println!("caller: {:?}", caller);
