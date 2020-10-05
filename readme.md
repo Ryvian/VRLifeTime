@@ -3,7 +3,13 @@ VRLifeTime
 An VS Code plugin to visualize lifetime in Rust programs to help avoid concurrency and memory bugs.
 Now for linux only.
 
-## Debug install
+## Install
+
+1. download the release .vsix file.
+
+2. `code --install-extension <path-to-.vsix-file>`
+
+## Development install
 
 1. install node.js
 
