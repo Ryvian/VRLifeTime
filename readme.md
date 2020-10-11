@@ -12,7 +12,7 @@ Now for linux only.
 
 ## Install
 
-1. install `rustup` from (rust-lang)[https://www.rust-lang.org/]
+1. install `rustup` from [rust-lang](https://www.rust-lang.org/)
 
 1. download .vsix file from the release.
 
