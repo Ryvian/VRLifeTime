@@ -4,3 +4,8 @@
 .gitignore
 tslint.json
 tsconfig.json
+backend/lifetime_query/target/**
+backend/rust-lock-bug-detector/target/**
+backend/rust-lock-bug-detector/.git/**
+.fuse_*
+.installed

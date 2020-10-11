@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 SHELL_FOLDER=$(dirname $(readlink -f "$0"))
-rustup component add rust-src > /dev/null
-rustup component add rustc-dev > /dev/null
+# rustup component add rust-src > /dev/null
+# rustup component add rustc-dev > /dev/null
 if [ -z "$1" ]; then
 	echo "No detecting directory is provided"
 	exit 1

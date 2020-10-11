@@ -6,17 +6,6 @@ const TIMEOUT_TIME = 20;
 let statusBar: vscode.StatusBarItem;
 
 
-interface DetectorOutput {
-	firstLock: {
-		type: string,
-		pos: string
-	},
-	secondLock: {
-		type: string,
-		pos: string,
-	},
-	callChain: string
-}
 
 // this method is called when vs code is activated
 export function activate(context: vscode.ExtensionContext) {
@@ -69,6 +58,21 @@ export function activate(context: vscode.ExtensionContext) {
 		return s;
 	}
 
+	// compile the rust components in `backend` if not already
+	function compileComponents() {
+		let testProcess = child_process.spawnSync(`cd ${__dirname}/.. && bash ./install_backend.sh`,
+		{
+		   shell: true,
+		   env: process.env
+	   });
+	   outputChannel.appendLine("compile the extension components")
+	   let output = testProcess.stderr.toString() + testProcess.stdout.toString();
+	   if (output == "") {
+		   outputChannel.appendLine("already compiled");
+	   } else {
+		   outputChannel.appendLine(output);
+	   }
+	}
 
 	function parsePositionRangeString(s: string){
 		let ranges: vscode.Range[] = [];
@@ -108,7 +112,10 @@ export function activate(context: vscode.ExtensionContext) {
 		function isNightlyInstalled(){
 			let stdout = "";
 			let testProcess = child_process.spawnSync("rustup show",
-			 {shell: true});
+			 {
+				shell: true,
+				env: process.env
+			});
 			
 			stdout = testProcess.stdout.toString();
 			outputChannel.appendLine(stdout);
@@ -120,25 +127,24 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		}
 
-		if (!isNightlyInstalled()){
-			statusBar.text = "installing rust nightly...";
-			statusBar.show();
-			// vscode.window.setStatusBarMessage();
-			let process = child_process.spawnSync(
-				'rustup toolchain install nightly-2020-05-10',
-				{shell: true});
-			outputChannel.appendLine(process.stdout.toString());
-			outputChannel.appendLine(process.stderr.toString());
-			statusBar.hide();
+		// if (!isNightlyInstalled()){
+		// 	statusBar.text = "installing rust nightly...";
+		// 	statusBar.show();
+		// 	// vscode.window.setStatusBarMessage();
+		// 	let child = child_process.spawnSync(
+		// 		'rustup toolchain install nightly-2020-05-10',
+		// 		{shell: true, env: process.env});
+		// 	outputChannel.appendLine(child.stdout.toString());
+		// 	outputChannel.appendLine(child.stderr.toString());
+		// 	statusBar.hide();
 
-		}
-		// statusBar.text = "building...";
-		// statusBar.show();
-		let process = child_process.spawnSync(`${__dirname}/../backend/lifetime_query/run.sh "${rootPath}"`,
-				{shell: true});
+		// }
 
-		outputChannel.appendLine(process.stdout.toString());
-		outputChannel.appendLine(process.stderr.toString());
+		let child = child_process.spawnSync(`${__dirname}/../backend/lifetime_query/run.sh "${rootPath}"`,
+				{shell: true, env:process.env});
+
+		outputChannel.appendLine(child.stdout.toString());
+		outputChannel.appendLine(child.stderr.toString());
 		// statusBar.hide();
 		return true;
 	}
@@ -160,10 +166,10 @@ export function activate(context: vscode.ExtensionContext) {
 		};
 		let inputString = JSON.stringify(inputObj);
 		outputChannel.appendLine("__dirname:" + __dirname);
-		let process = child_process.spawnSync(
+		let child = child_process.spawnSync(
 			`"${__dirname}/../backend/lifetime_query/query.sh" "${inputString.replace(/"/g, '\\"')}"`, 
-			{shell: true});
-		let returnMsg = process.stdout.toString() + process.stderr.toString();
+			{shell: true, env: process.env});
+		let returnMsg = child.stdout.toString() + child.stderr.toString();
 		let returnObj = {};
 		try {
 			returnObj = JSON.parse(returnMsg);
@@ -184,8 +190,10 @@ export function activate(context: vscode.ExtensionContext) {
 		str += returnMsg;
 		outputChannel.appendLine(str);
 		for (let file in returnObj) {
+			// @ts-ignore
 			let s = returnObj[file];
 			let ranges = parsePositionRangeString(s);
+			// @ts-ignore
 			returnObj[file] = ranges;
 		}
 		lifetimeObj = returnObj;
@@ -205,6 +213,7 @@ export function activate(context: vscode.ExtensionContext) {
 			let regEx = new RegExp(key + "$");
 			let match = regEx.exec(filename);
 			if (match) {
+				// @ts-ignore
 				ranges = lifetimeObj[key];
 				break;
 			}
@@ -314,10 +323,10 @@ export function activate(context: vscode.ExtensionContext) {
 	function getDiagnosticObj() {
 		let analyzerInputObj = {
 		}
-		let process = child_process.spawnSync(
+		let child = child_process.spawnSync(
 			`cd ${rootPath} && cargo clean && cargo +nightly-2020-05-10 lock-bug-detect double-lock`, 
-			{shell: true});
-		let returnMsg = process.stdout.toString();
+			{shell: true, env: process.env});
+		let returnMsg = child.stdout.toString();
 		let detectorOutput = Object();
 		try {
 			detectorOutput = parseDetectorOutput(returnMsg);
@@ -427,7 +436,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 		}
 		if (document && document.uri.path.search(dirPath) != -1) {
-			collection.set(diagnosticArray);
+			if (diagnosticArray.length != 0) {
+				// @ts-ignore
+				collection.set(diagnosticArray);
+			} else {
+				collection.clear();
+			}
+			
 		} else {
 			collection.clear();
 		}
@@ -463,9 +478,8 @@ export function activate(context: vscode.ExtensionContext) {
 		if (activeEditor == event.textEditor) {
 			if (event.selections[0].isEmpty) return;
 			selectedText = activeEditor.document.getText(event.selections[0]);
-			outputChannel.appendLine("selection changed 1");
+			outputChannel.appendLine(`selected ${selectedText}`);
 			updateLifetimeObj(false);
-			outputChannel.appendLine("selection changed");
 			triggerUpdateDecorations();
 		}
 	}, null, context.subscriptions);
@@ -476,6 +490,7 @@ export function activate(context: vscode.ExtensionContext) {
 		updateDiagnostics(collection);
 	}, null, context.subscriptions);
 
+	compileComponents();
 	if (activeEditor) {
 		updateDiagnostics(collection);
 

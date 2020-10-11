@@ -1,9 +1,28 @@
 VRLifeTime
 --------
-An VS Code plugin to visualize lifetime in Rust programs to help avoid concurrency and memory bugs.
+A VS Code plugin to visualize lifetime in Rust programs to help avoid concurrency and memory bugs, and providing double lock detection information.
 Now for linux only.
 
-## Debug install
+
+## Usage
+
+1. Open a Rust project folder in VSCode (where the .toml file exists)
+
+2. Open a Rust source file in VSCode; select the object you want to visualize; save the file (ctrl+S) to update diagnostic information
+
+## Install
+
+1. install `rustup` from (rust-lang)[https://www.rust-lang.org/]
+
+1. download .vsix file from the release.
+
+2. `code --install-extension <path-to-.vsix-file>`
+
+
+
+## Development
+
+### install
 
 1. install node.js
 
@@ -17,9 +36,3 @@ $ npm run compile
 ```
 
 3. open this folder in VS Code and press `F5`. select `VS Code development (preview)`.
-
-## Usage
-
-1. Open a Rust project folder in VSCode
-
-2. Open a Rust source file in VSCode; select the object you want to visualize 
