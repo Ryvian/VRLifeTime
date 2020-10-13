@@ -36,3 +36,7 @@ $ npm run compile
 ```
 
 3. open this folder in VS Code and press `F5`. select `VS Code development (preview)`.
+
+## Misc
+
+The tool currently does not intend to visualize lifetime of references.
